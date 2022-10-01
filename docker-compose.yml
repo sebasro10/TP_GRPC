@@ -1,19 +1,22 @@
 version: "3.9"
 services:
   movie:
+    container_name: movie_grpc
     build: ./movie/
     ports:
       - "3001:3001"
   showtime:
+    container_name: showtime_grpc
     build: ./showtime/
     ports:
       - "3002:3002"
   booking:
+    container_name: booking_grpc
     build: ./booking/
     ports:
         - "3003:3003"
   user:
+    container_name: user_grpc
     build: ./user/
     ports:
         - "3004:3004"
-
