@@ -13,19 +13,27 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0bmovie.proto\"\x15\n\x07MovieID\x12\n\n\x02id\x18\x01 \x01(\t\"H\n\tMovieData\x12\r\n\x05title\x18\x01 \x01(\t\x12\x0e\n\x06rating\x18\x02 \x01(\x02\x12\x10\n\x08\x64irector\x18\x03 \x01(\t\x12\n\n\x02id\x18\x04 \x01(\t\"\x07\n\x05\x45mpty2X\n\x05Movie\x12&\n\x0cGetMovieByID\x12\x08.MovieID\x1a\n.MovieData\"\x00\x12\'\n\rGetListMovies\x12\x06.Empty\x1a\n.MovieData\"\x00\x30\x01\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0bmovie.proto\"\x1a\n\x07Message\x12\x0f\n\x07message\x18\x01 \x01(\t\"\x15\n\x07MovieID\x12\n\n\x02id\x18\x01 \x01(\t\"\x1b\n\nMovieTitle\x12\r\n\x05title\x18\x01 \x01(\t\"!\n\rMovieDirector\x12\x10\n\x08\x64irector\x18\x01 \x01(\t\"H\n\tMovieData\x12\r\n\x05title\x18\x01 \x01(\t\x12\x0e\n\x06rating\x18\x02 \x01(\x02\x12\x10\n\x08\x64irector\x18\x03 \x01(\t\x12\n\n\x02id\x18\x04 \x01(\t\"\'\n\tMovieRate\x12\x0e\n\x06rating\x18\x01 \x01(\x02\x12\n\n\x02id\x18\x02 \x01(\t\"\x07\n\x05\x45mpty2\xd4\x02\n\x05Movie\x12\x1a\n\x04Home\x12\x06.Empty\x1a\x08.Message\"\x00\x12&\n\x0cGetMovieByID\x12\x08.MovieID\x1a\n.MovieData\"\x00\x12\'\n\rGetListMovies\x12\x06.Empty\x1a\n.MovieData\"\x00\x30\x01\x12,\n\x0fGetMovieByTitle\x12\x0b.MovieTitle\x1a\n.MovieData\"\x00\x12%\n\x0b\x43reateMovie\x12\n.MovieData\x1a\x08.Message\"\x00\x12+\n\x0fUpdateMovieRate\x12\n.MovieRate\x1a\n.MovieData\"\x00\x12%\n\x0b\x44\x65leteMovie\x12\x08.MovieID\x1a\n.MovieData\"\x00\x12\x35\n\x13GetMoviesByDirector\x12\x0e.MovieDirector\x1a\n.MovieData\"\x00\x30\x01\x62\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'movie_pb2', globals())
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
-  _MOVIEID._serialized_start=15
-  _MOVIEID._serialized_end=36
-  _MOVIEDATA._serialized_start=38
-  _MOVIEDATA._serialized_end=110
-  _EMPTY._serialized_start=112
-  _EMPTY._serialized_end=119
-  _MOVIE._serialized_start=121
-  _MOVIE._serialized_end=209
+  _MESSAGE._serialized_start=15
+  _MESSAGE._serialized_end=41
+  _MOVIEID._serialized_start=43
+  _MOVIEID._serialized_end=64
+  _MOVIETITLE._serialized_start=66
+  _MOVIETITLE._serialized_end=93
+  _MOVIEDIRECTOR._serialized_start=95
+  _MOVIEDIRECTOR._serialized_end=128
+  _MOVIEDATA._serialized_start=130
+  _MOVIEDATA._serialized_end=202
+  _MOVIERATE._serialized_start=204
+  _MOVIERATE._serialized_end=243
+  _EMPTY._serialized_start=245
+  _EMPTY._serialized_end=252
+  _MOVIE._serialized_start=255
+  _MOVIE._serialized_end=595
 # @@protoc_insertion_point(module_scope)
