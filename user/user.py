@@ -2,13 +2,14 @@ from flask import Flask, render_template, request, jsonify, make_response
 import requests
 import json
 from werkzeug.exceptions import NotFound
+from google.protobuf.json_format import MessageToDict
 
 import grpc
 from concurrent import futures
 # import booking_pb2
 # import booking_pb2_grpc
-# import movie_pb2
-# import movie_pb2_grpc
+import movie_pb2
+import movie_pb2_grpc
 
 app = Flask(__name__)
 
@@ -31,24 +32,28 @@ def home():
 def get_bookings_bynameorid(nameorid):
    for user in users:
         if str(user["name"]) == str(nameorid) or str(user["id"]) == str(nameorid):
-            return make_response(jsonify(requests.get('http://booking:3201/bookings/'+user["id"]).json()),200)
+            return make_response(jsonify(requests.get('http://booking_grpc:3003/bookings/'+user["id"]).json()),200)
    return make_response(jsonify({"error":"user not found"}),400)
 
 @app.route("/bookings/<userid>", methods=['POST'])
 def create_booking(userid):
    req = request.get_json()
    if existsUser(userid):
-      return make_response(jsonify(requests.post('http://booking:3201/bookings/'+userid, json=req).json()),200)
+      return make_response(jsonify(requests.post('http://booking_grpc:3003/bookings/'+userid, json=req).json()),200)
    return make_response(jsonify({"error":"user not found"}),400)
 
 @app.route("/movies/<userid>", methods=['GET'])
 def get_info_movies(userid):
    if existsUser(userid):
-      bookings = requests.get('http://booking:3201/bookings/'+userid).json()
+      bookings = requests.get('http://booking_grpc:3003/bookings/'+userid).json()
       for date in bookings["dates"]:
          movies= []
          for movieid in date["movies"]:
-            movies.append(requests.get('http://movie:3200/movies/'+movieid).json())
+            with grpc.insecure_channel('movie_grpc:3001') as channel:
+               stub = movie_pb2_grpc.MovieStub(channel)
+               movie = stub.GetMovieByID(movie_pb2.MovieID(id=movieid))
+               movies.append(MessageToDict(movie))
+            channel.close()
          date["movies"] = movies
 
       return make_response(jsonify(bookings),200)
