@@ -2,6 +2,8 @@ import grpc
 
 import movie_pb2
 import movie_pb2_grpc
+import showtime_pb2
+import showtime_pb2_grpc
 
 def get_movie_by_id(stub,id):
     movie = stub.GetMovieByID(id)
@@ -32,6 +34,14 @@ def get_movies_by_director(stub,director):
     for movie in movies:
         print("Movie called %s" % (movie.title))
 
+def get_times(stub):
+    times = stub.GetTimes(showtime_pb2.Empty2())
+    for time in times.schedule:
+        print("Date: %s\nMovies: %s\n" % (time.date, time.movies))
+
+def get_movies_by_date(stub, date):
+    moviesByDate = stub.GetMoviesByDate(date)
+    print("Date: %s\nMovies: %s\n" % (moviesByDate.date, moviesByDate.movies))
 
 def run():
     # NOTE(gRPC Python Team): .close() is possible on a channel and should be
@@ -64,6 +74,20 @@ def run():
         
         print("-------------- GetMoviesByDirector ---------")
         get_movies_by_director(stub, movie_pb2.MovieDirector(director="Peter Sohn"))
+
+    channel.close()
+    
+    with grpc.insecure_channel('localhost:3002') as channel:
+        stub = showtime_pb2_grpc.ShowtimeStub(channel)
+        
+        print("\n\n--------- Showtime -> Home ----------------")
+        print(stub.Home(showtime_pb2.Empty2()))
+        
+        print("--------- Showtime -> GetTimes ------------")
+        get_times(stub)
+        
+        print("--------- Showtime -> GetMoviesByDate -----")
+        get_movies_by_date(stub, showtime_pb2.Date(date="20151204"))
 
     channel.close()
 
