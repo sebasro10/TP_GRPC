@@ -2,6 +2,10 @@ from flask import Flask, render_template, request, jsonify, make_response
 import requests
 import json
 from werkzeug.exceptions import NotFound
+import grpc
+
+import showtime_pb2
+import showtime_pb2_grpc
 
 app = Flask(__name__)
 
@@ -31,12 +35,15 @@ def get_bookings_byuserid(userid):
 @app.route("/bookings/<userid>", methods=['POST'])
 def create_booking(userid):
     req = request.get_json()
-    times = requests.get('http://showtime:3202/showtimes').json()["schedule"]
+    with grpc.insecure_channel('showtime_grpc:3002') as channel:
+        stub = showtime_pb2_grpc.ShowtimeStub(channel)
+        times = stub.GetTimes(showtime_pb2.Empty2()).schedule
+    channel.close()
     
     existsTime = False
     for time in times:
-        if str(time["date"]) == str(req["date"]):
-            if str(req["movieid"]) in time["movies"]: existsTime = True
+        if str(time.date) == str(req["date"]):
+            if str(req["movieid"]) in time.movies: existsTime = True
     if not existsTime: return make_response(jsonify({"error":"schedule does not exist"}),400)
 
     for booking in bookings:
