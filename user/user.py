@@ -1,13 +1,12 @@
 from flask import Flask, render_template, request, jsonify, make_response
-import requests
 import json
 from werkzeug.exceptions import NotFound
 from google.protobuf.json_format import MessageToDict
 
 import grpc
 from concurrent import futures
-# import booking_pb2
-# import booking_pb2_grpc
+import booking_pb2
+import booking_pb2_grpc
 import movie_pb2
 import movie_pb2_grpc
 
@@ -24,6 +23,20 @@ def existsUser(userId):
         if str(user["id"]) == str(userId): return True
    return False
 
+def getBookingsByUserID(userId):
+   with grpc.insecure_channel('booking_grpc:3003') as channel:
+      stub = booking_pb2_grpc.BookingStub(channel)
+      bookingsByUserID = MessageToDict(stub.GetBookingsByUserID(booking_pb2.UserID(userid=userId)))
+   channel.close()
+   return bookingsByUserID
+
+def createBooking(newBooking):
+   with grpc.insecure_channel('booking_grpc:3003') as channel:
+      stub = booking_pb2_grpc.BookingStub(channel)
+      bookingsByUserID = MessageToDict(stub.CreateBooking(newBooking))
+   channel.close()
+   return bookingsByUserID
+
 @app.route("/", methods=['GET'])
 def home():
    return "<h1 style='color:blue'>Welcome to the User service!</h1>"
@@ -32,20 +45,20 @@ def home():
 def get_bookings_bynameorid(nameorid):
    for user in users:
         if str(user["name"]) == str(nameorid) or str(user["id"]) == str(nameorid):
-            return make_response(jsonify(requests.get('http://booking_grpc:3003/bookings/'+user["id"]).json()),200)
+            return make_response(jsonify(getBookingsByUserID(user["id"])),200)
    return make_response(jsonify({"error":"user not found"}),400)
 
 @app.route("/bookings/<userid>", methods=['POST'])
 def create_booking(userid):
    req = request.get_json()
    if existsUser(userid):
-      return make_response(jsonify(requests.post('http://booking_grpc:3003/bookings/'+userid, json=req).json()),200)
+      return make_response(jsonify(createBooking(booking_pb2.BookingDataToCreate(userid=userid,date=req["date"],movieid=req["movieid"]))),200)
    return make_response(jsonify({"error":"user not found"}),400)
 
 @app.route("/movies/<userid>", methods=['GET'])
 def get_info_movies(userid):
    if existsUser(userid):
-      bookings = requests.get('http://booking_grpc:3003/bookings/'+userid).json()
+      bookings = getBookingsByUserID(userid)
       for date in bookings["dates"]:
          movies= []
          for movieid in date["movies"]:
