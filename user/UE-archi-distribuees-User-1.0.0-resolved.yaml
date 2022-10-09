@@ -1,0 +1,205 @@
+---
+openapi: 3.0.0
+info:
+  title: User API
+  description: This is the API of the User service
+  contact:
+    email: sebastian.romero@imt-atlantique.fr
+  license:
+    name: GPL v3
+    url: https://www.gnu.org/licenses/gpl-3.0.en.html
+  version: 1.0.0
+servers:
+- url: http://localhost:3004
+  description: For local tests
+tags:
+- name: admins
+  description: Secured Admin-only calls
+- name: developers
+  description: Operations available to regular developers
+paths:
+  /:
+    get:
+      tags:
+      - developers
+      summary: home page of the service
+      description: |
+        Nothing to do
+      operationId: home
+      responses:
+        "200":
+          description: welcome message
+          content:
+            text/html:
+              schema:
+                type: string
+                example: <h1>Test</h1>
+  /bookings/{userid}:
+    get:
+      tags:
+      - developers
+      summary: get the bookings from a user id or name
+      description: |
+        By passing in the appropriate options, you can get bookings of a user
+      operationId: get_bookings_bynameorid
+      parameters:
+      - name: userid
+        in: path
+        description: User ID or User Name.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          maximum: 1
+          minimum: 1
+          type: string
+      responses:
+        "200":
+          description: Bookings of the user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingsUser'
+    post:
+      tags:
+      - admins
+      summary: add a booking for a user
+      description: Adds a booking for the user
+      operationId: add_booking_byuser
+      parameters:
+      - name: userid
+        in: path
+        description: User ID.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          maximum: 1
+          minimum: 1
+          type: string
+      requestBody:
+        description: item to add
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewMovie'
+      responses:
+        "200":
+          description: Booking created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingsUser'
+  /movies/{userid}:
+    get:
+      tags:
+      - developers
+      summary: get the bookings from a user with films data
+      description: |
+        By passing in the appropriate options, you can get the bookings from a user with films data
+      operationId: get_info_movies
+      parameters:
+      - name: userid
+        in: path
+        description: User ID.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          maximum: 1
+          minimum: 1
+          type: string
+      responses:
+        "200":
+          description: Bookings of the user with films data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingsUser2'
+components:
+  schemas:
+    BookingsUser:
+      required:
+      - dates
+      - userid
+      type: object
+      properties:
+        userid:
+          type: string
+          example: chris_rivers
+        dates:
+          type: array
+          items:
+            $ref: '#/components/schemas/DateItem'
+    DateItem:
+      required:
+      - date
+      - movies
+      type: object
+      properties:
+        date:
+          type: string
+          example: "20151201"
+        movies:
+          type: array
+          items:
+            type: string
+            example: 276c79ec-a26a-40a6-b3d3-fb242a5947b6
+    BookingsUser2:
+      required:
+      - dates
+      - userid
+      type: object
+      properties:
+        userid:
+          type: string
+          example: chris_rivers
+        dates:
+          type: array
+          items:
+            $ref: '#/components/schemas/DateItem2'
+    DateItem2:
+      required:
+      - date
+      - movies
+      type: object
+      properties:
+        date:
+          type: string
+          example: "20151201"
+        movies:
+          type: array
+          items:
+            $ref: '#/components/schemas/MovieItem'
+    MovieItem:
+      required:
+      - director
+      - id
+      - rating
+      - title
+      type: object
+      properties:
+        id:
+          type: string
+          example: 267eedb8-0f5d-42d5-8f43-72426b9fb3e6
+        title:
+          type: string
+          example: The Martian
+        rating:
+          type: string
+          example: "7"
+        director:
+          type: string
+          example: Paul McGuigan
+    NewMovie:
+      required:
+      - date
+      - movieid
+      type: object
+      properties:
+        date:
+          type: string
+          example: "20151201"
+        movieid:
+          type: string
+          example: 276c79ec-a26a-40a6-b3d3-fb242a5947b6
